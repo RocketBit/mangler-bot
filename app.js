@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-const slackToken = 'Rs1Onnojds3P7jFEKWhoLInM';
+const slackToken = ''; // If you want to tie it to a single Slack team, use this
 
 app.get('/', function (req, res) {
     console.log(req);
