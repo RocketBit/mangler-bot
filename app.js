@@ -1,8 +1,20 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+const fs = require('fs');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+// Load the word lists
+var lists = [];
+try {
+    lists.push(fs.readFileSync('./lists/adjectives.txt').toString().split('\r\n'));
+    lists.push(fs.readFileSync('./lists/adverbs.txt').toString().split('\r\n'));
+    lists.push(fs.readFileSync('./lists/nouns.txt').toString().split('\r\n'));
+    lists.push(fs.readFileSync('./lists/verbs.txt').toString().split('\r\n'));
+} catch(e) {
+    console.error(e);
+}
 
 const slackToken = ''; // If you want to tie it to a single Slack team, use this
 
@@ -26,7 +38,6 @@ app.listen(2095, function () {
 
 function mangleMe(body, res){
     
-    const fs = require('fs');
     // returns the path to the word list which is separated by `\n`
     const wordListPath = require('word-list');
     const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
@@ -47,13 +58,12 @@ function mangleMe(body, res){
         return;
     }
     
+    let newWords = partsMangler(acro);
+    
     let message = '*' + acro.toUpperCase() + ':*';
-    acro.split('').forEach(l => {
-        let words = wordArray.filter(w => {
-            return w.charAt(0) === l.toLowerCase();
-        });
-        let word = words[Math.floor(Math.random()*words.length)];
-        message += '\n<http://www.dictionary.com/browse/' + word + '|' + l.toUpperCase() + word.substr(1) + '>';
+    
+    newWords.forEach(w => {
+        message += '\n<https://en.wiktionary.org/wiki/' + w + '|' + w.charAt(0).toUpperCase() + w.substr(1) + '>';
     });
     
     let payload = {
@@ -62,3 +72,51 @@ function mangleMe(body, res){
     };
     res.send(payload);
 }
+
+function partsMangler(acro,words,last){
+    // 0 = adjective
+    // 1 = adverb
+    // 2 = noun
+    // 3 = verb
+    words = words || [];
+    last = last===undefined?-1:last;
+    
+    if(words && words.length >= acro.length){
+        return words;
+    }
+    let types = [];
+    // The most basic of grammar algorithms. 
+    switch (last) {
+        case -1:
+            types = [0,2];
+            break;
+        case 0:
+            types = [2];
+            break;
+        case 1:
+            types = [3];
+            break;
+        case 2:
+            types = [1,3];
+            break;
+        case 3:
+            types = [0,1,2];
+            break;
+    }
+    last = types[Math.floor(Math.random() * types.length)];
+    
+    let possible = lists[last].filter(w => {
+        return (w.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
+    });
+    words.push(possible[Math.floor(Math.random() * possible.length)]);
+    if(words.length < acro.length){
+        return partsMangler(acro,words,last);
+    } else {
+        return words;
+    }
+}
+
+
+
+
+
