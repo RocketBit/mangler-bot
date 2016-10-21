@@ -9,9 +9,13 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 var lists = [];
 try {
     lists.push(fs.readFileSync('./lists/adjectives.txt').toString().split('\r\n'));
-    lists.push(fs.readFileSync('./lists/adverbs.txt').toString().split('\r\n'));
+    console.log(lists[0].length + ' adjectives');
+    lists.push(fs.readFileSync('./lists/adverbs.txt').toString().split('\n'));
+    console.log(lists[1].length + ' adverbs');
     lists.push(fs.readFileSync('./lists/nouns.txt').toString().split('\r\n'));
+    console.log(lists[2].length + ' nouns');
     lists.push(fs.readFileSync('./lists/verbs.txt').toString().split('\r\n'));
+    console.log(lists[3].length + ' verbs');
 } catch(e) {
     console.error(e);
 }
@@ -59,6 +63,7 @@ function mangleMe(body, res){
     }
     
     let newWords = partsMangler(acro);
+    console.log(newWords);
     
     let message = '*' + acro.toUpperCase() + ':*';
     
@@ -105,6 +110,7 @@ function partsMangler(acro,words,last){
     }
     last = types[Math.floor(Math.random() * types.length)];
     
+    console.log(acro.charAt(words.length),last);
     let possible = lists[last].filter(w => {
         return (w.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
     });
