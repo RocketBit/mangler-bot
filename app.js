@@ -5,6 +5,20 @@ const fs = require('fs');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
+// Define the possible patterns
+// 0 = adjective
+// 1 = adverb
+// 2 = noun
+// 3 = verb
+const patterns = [
+    [],
+    [[2]],
+    [[0,2],[2,2]],
+    [[0,0,2],[2,2,2],[0,2,2],[1,0,2]],
+    [[0,0,0,2],[0,2,2,2][2,2,2,2],[1,0,0,2],[1,0,2,2]],
+    [[0,0,0,0,2],[0,2,2,2,2],[2,2,2,2,2],[1,0,2,2,2]]
+]
+
 // Load the word lists
 var lists = [];
 try {
@@ -48,8 +62,8 @@ app.listen(2095, function () {
 function mangleMe(body, res){
     
     // returns the path to the word list which is separated by `\n`
-    const wordListPath = require('word-list');
-    const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
+    // const wordListPath = require('word-list');
+    // const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
     
     let acro = body.text.split(' ')[0];
     if(!acro || acro === ''){
@@ -57,8 +71,8 @@ function mangleMe(body, res){
         return;
     }
     
-    if(acro.length > 10){
-        res.send("Let's not be silly. Keep them 10 characters or less, mmmkay?");
+    if(acro.length > 5){
+        res.send("Let's not be silly. Keep them 5 characters or less, mmmkay?");
         return;
     }
     
@@ -66,8 +80,15 @@ function mangleMe(body, res){
         res.send('Sorry, we can only do letters.');
         return;
     }
+
+    let patternSet = patterns[acro.length]
+    console.log(patternSet)
+    let rando = Math.floor(Math.random() * patternSet.length)
+    console.log(rando)
+    let pattern = patternSet[rando]
+    console.log(pattern)
     
-    let newWords = partsMangler(acro);
+    let newWords = partsMangler(acro,[],pattern);
     console.log(newWords);
     
     let message = '*' + acro.toUpperCase() + ':*';
@@ -83,49 +104,27 @@ function mangleMe(body, res){
     res.send(payload);
 }
 
-function partsMangler(acro,words,last){
+function partsMangler(acro,words,pattern){
     // 0 = adjective
     // 1 = adverb
     // 2 = noun
     // 3 = verb
     words = words || [];
-    last = last===undefined?-1:last;
-    
+
     if(words && words.length >= acro.length){
         return words;
     }
-    let types = [];
-    // The most basic of grammar algorithms. 
-    switch (last) {
-        case -1:
-            types = [0,2];
-            break;
-        case 0:
-            types = [2];
-            break;
-        case 1:
-            types = [3];
-            break;
-        case 2:
-            types = [1,3];
-            break;
-        case 3:
-            types = [0,1,2];
-            break;
-    }
-    last = types[Math.floor(Math.random() * types.length)];
-    
-    console.log(acro.charAt(words.length),last);
-    let possible = lists[last].filter(w => {
+    let type = pattern[words.length]
+    let possible = lists[type].filter(w => {
         return (w.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
     });
     let word = possible[Math.floor(Math.random() * possible.length)];
-    if(last === 3){
+    if(type === 3){
         word += "s";
     }
     words.push(word);
     if(words.length < acro.length){
-        return partsMangler(acro,words,last);
+        return partsMangler(acro,words,pattern);
     } else {
         return words;
     }
