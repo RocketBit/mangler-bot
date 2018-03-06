@@ -90,12 +90,21 @@ function mangleMe(body, res){
     
     let newWords = partsMangler(acro,[],pattern);
     console.log(newWords);
+
+    let message = ''
     
-    let message = '*' + acro.toUpperCase() + ':*';
+    if (body.twitter) {
+      message = acro.toUpperCase() + ':'
+      newWords.forEach(w => {
+	message += '\n' + w.charAt(0).toUpperCase() + w.substr(1)
+      })
+    } else {
+      message = '*' + acro.toUpperCase() + ':*';
     
-    newWords.forEach(w => {
-        message += '\n<https://en.wiktionary.org/wiki/' + w + '|' + w.charAt(0).toUpperCase() + w.substr(1) + '>';
-    });
+      newWords.forEach(w => {
+          message += '\n<https://en.wiktionary.org/wiki/' + w + '|' + w.charAt(0).toUpperCase() + w.substr(1) + '>';
+      });
+    }
     
     let payload = {
         response_type: 'in_channel',
