@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 const fs = require('fs');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+const ngramMangling = true;
 
 // Define the possible patterns
 // 0 = adjective
@@ -21,20 +22,35 @@ const patterns = [
 
 // Load the word lists
 var lists = [];
+// trigram map of int - three keys
+// bigram map of int - two keys
+// freq map of int - one key
 try {
-    //lists.push(fs.readFileSync('./lists/adjectives.txt').toString().split('\r\n'));
-    lists.push(require('./lists/adjectives-2.json').adjectives);
-    console.log(lists[0].length + ' adjectives');
-    //lists.push(fs.readFileSync('./lists/adverbs.txt').toString().split('\n'));
-    lists.push(require('./lists/adverbs-2.json').adverbs);
-    console.log(lists[1].length + ' adverbs');
-    //lists.push(fs.readFileSync('./lists/nouns.txt').toString().split('\r\n'));
-    lists.push(require('./lists/nouns-2.json').nouns);
-    console.log(lists[2].length + ' nouns');
-    //lists.push(fs.readFileSync('./lists/verbs.txt').toString().split('\r\n'));
-    let vlist = require('./lists/verbs-tense.json').verbs.map(v => v.present);
-    lists.push(vlist);
-    console.log(lists[3].length + ' verbs');
+    if (ngramMangling) {
+	// Load the source text (Should be a large volume of text, preferably from a variety of contexts)
+	// ...
+	// for each text
+	// ...
+	    // for every word in the text
+	    // ...
+	        // increment relevent maps
+	        // ...
+    } else {
+	//lists.push(fs.readFileSync('./lists/adjectives.txt').toString().split('\r\n'));
+	lists.push(require('./lists/adjectives-2.json').adjectives);
+	console.log(lists[0].length + ' adjectives');
+	//lists.push(fs.readFileSync('./lists/adverbs.txt').toString().split('\n'));
+	lists.push(require('./lists/adverbs-2.json').adverbs);
+	console.log(lists[1].length + ' adverbs');
+	//lists.push(fs.readFileSync('./lists/nouns.txt').toString().split('\r\n'));
+	lists.push(require('./lists/nouns-2.json').nouns);
+	console.log(lists[2].length + ' nouns');
+	//lists.push(fs.readFileSync('./lists/verbs.txt').toString().split('\r\n'));
+	let vlist = require('./lists/verbs-tense.json').verbs.map(v => v.present);
+	lists.push(vlist);
+	console.log(lists[3].length + ' verbs');
+    }
+
 } catch(e) {
     console.error(e);
 }
@@ -71,7 +87,7 @@ function mangleMe(body, res){
         return;
     }
     
-    if(acro.length > 5){
+    if(acro.length > 5 && !ngramMangling){
         res.send("Let's not be silly. Keep them 5 characters or less, mmmkay?");
         return;
     }
@@ -81,14 +97,20 @@ function mangleMe(body, res){
         return;
     }
 
-    let patternSet = patterns[acro.length]
-    console.log(patternSet)
-    let rando = Math.floor(Math.random() * patternSet.length)
-    console.log(rando)
-    let pattern = patternSet[rando]
-    console.log(pattern)
+    let newWords = [];
     
-    let newWords = partsMangler(acro,[],pattern);
+    if (ngramMangling) {
+	newWords = partsManglerNGram(acro,[]);
+    } else {
+	let patternSet = patterns[acro.length]
+	console.log(patternSet)
+	let rando = Math.floor(Math.random() * patternSet.length)
+	console.log(rando)
+	let pattern = patternSet[rando]
+	console.log(pattern)
+
+	newWords = partsMangler(acro,[],pattern);
+    }
     console.log(newWords);
 
     let message = ''
@@ -139,7 +161,27 @@ function partsMangler(acro,words,pattern){
     }
 }
 
+function partsManglerNGram(acro,words){
+    
+    words = words || [];
 
-
-
-
+    if(words && words.length >= acro.length){
+        return words;
+    }
+    
+    // Choose first word randomly
+    // ...
+    // Choose second word by P(word | first_word)
+    // ...
+    // Choose third+ word by P(word | previous_words)
+    // ...
+    
+    words.push(word);
+    
+    // Why is this a recursive function rather than iterative??
+    if(words.length < acro.length){ 
+        return partsMangler(acro,words,pattern);
+    } else {
+        return words;
+    }
+}
