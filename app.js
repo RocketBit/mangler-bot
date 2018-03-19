@@ -29,11 +29,12 @@ var freq = new Map();
 
 try {
     if (ngramMangling) {
-	// Load the source text (Should be a large volume of text, preferably from a variety of contexts)
+	// Load the source text from clean word list
+	let sentences = [];
+	sentences.push(fs.readFileSync('./lists/clean.txt').toString().split('\r\n'));
+	// for each sentence
 	// ...
-	// for each text
-	// ...
-	    // for every word in the text
+	    // for every word in the sentence
 	    // ...
 	        // increment relevent maps
 	        // ...
@@ -180,7 +181,6 @@ function partsManglerNGram(acro,words){
     
     words.push(word);
     
-    // Why is this a recursive function rather than iterative??
     if(words.length < acro.length){ 
         return partsMangler(acro,words,pattern);
     } else {
