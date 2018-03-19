@@ -22,9 +22,11 @@ const patterns = [
 
 // Load the word lists
 var lists = [];
-// trigram map of int - three keys
 // bigram map of int - two keys
+var bigram = new Map();
 // freq map of int - one key
+var freq = new Map();
+
 try {
     if (ngramMangling) {
 	// Load the source text (Should be a large volume of text, preferably from a variety of contexts)
