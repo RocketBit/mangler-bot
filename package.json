@@ -9,8 +9,9 @@
   "author": "RocketBit.co",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
     "word-list": "^1.0.1"
   }
 }

@@ -78,18 +78,28 @@ app.listen(2095, function () {
   console.log('Example app listening on port 2095!');
 });
 
-function mangleMe(body, res){
+// DEBUG ....................................
+var text = 'foss';
+mangleMe([],text,[]);
+// DEBUG ....................................
+
+// DEBUG - original function mangleMe(body, res) {
+function mangleMe(body, text, res){
     
     // returns the path to the word list which is separated by `\n`
     // const wordListPath = require('word-list');
     // const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
+
+    // DEBUG .....................................................
+    let acro = text.split(' ')[0];
+    //    let acro = body.text.split(' ')[0];
+    // DEBUG .....................................................
     
-    let acro = body.text.split(' ')[0];
     if(!acro || acro === ''){
         res.send('Please include an acronym with your request.');
         return;
     }
-    
+
     if(acro.length > 5 && !ngramMangling){
         res.send("Let's not be silly. Keep them 5 characters or less, mmmkay?");
         return;
