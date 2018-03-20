@@ -23,7 +23,7 @@ const patterns = [
 // Load the word lists
 var lists = [];
 // bigram map of int - two keys
-var bigram = new Map();
+var bigrams = new Map();
 // freq map of int - one key
 var freq = new Map();
 
@@ -33,11 +33,29 @@ try {
 	let sentences = [];
 	sentences.push(fs.readFileSync('./lists/clean.txt').toString().split('\r\n'));
 	// for each sentence
-	// ...
+	sentences.forEach(function(sentence) {
 	    // for every word in the sentence
-	    // ...
-	        // increment relevent maps
-	        // ...
+	    let prev = "";
+	    sentence.split(' ').forEach(function(word) {
+		// increment frequency map
+		if (freq.get(word) === undefined) {
+		    freq.set(word,1);
+		} else {
+		    freq.set(word,freq.get(word)+1);
+		}
+
+		// increment bigrams map
+		if (prev != "") {
+		    let bigram = [prev,word];
+		    if (bigrams.get(bigram) === undefined) {
+			bigrams.set(bigram,1);
+		    } else {
+			bigrams.set(bigram,bigrams.get(bigram)+1);
+		    }
+		}
+		prev = word;
+	    })
+	})
     } else {
 	//lists.push(fs.readFileSync('./lists/adjectives.txt').toString().split('\r\n'));
 	lists.push(require('./lists/adjectives-2.json').adjectives);
