@@ -30,8 +30,10 @@ var freq = new Map();
 try {
     if (ngramMangling) {
 	// Load the source text from clean word list
-	let sentences = [];
-	sentences.push(fs.readFileSync('./lists/clean.txt').toString().split('\r\n'));
+	let sentences = new Array(0);
+	let wordlist = fs.readFileSync('./lists/clean.txt').toString();
+	sentences = wordlist.split('\n');
+	
 	// for each sentence
 	sentences.forEach(function(sentence) {
 	    // for every word in the sentence
@@ -129,7 +131,7 @@ function mangleMe(body, text, res){
     }
 
     let newWords = [];
-    
+
     if (ngramMangling) {
 	newWords = partsManglerNGram(acro,[]);
     } else {
