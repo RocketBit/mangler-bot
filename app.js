@@ -202,40 +202,47 @@ function partsManglerNGram(acro,words){
         return words;
     }
 
+    let word = '';
+
     if (words.length == 0) {
 	// Pick random word starting with the correct letter
-	let possible = freq.filter( w => {
-	    return (w.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
-	});
-	let word = possible[Math.floor(Math.random() * possible.length)];
+	let possible = [];
+	for (var wordFromFreq of freq.keys()) {
+	    if (wordFromFreq.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase())
+		possible.push(wordFromFreq);
+	}
+	word = possible[Math.floor(Math.random() * possible.length)];
     } else {
 	// Pick word which results in the highest P(word | previousWord)
 	// P(word | previousWord) = count(previousWord followed by word)
 	// Given that previousWord is already set
-	let previousWord = words.at(words.length - 1);
-	let possible = bigrams.filter( w => {
-	    return ( w[0].toLowerCase() === previousWord.toLowerCase()
-		     && w[1].charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
-	});
 
-	// If there is a match find the best
-	if (possible.length > 0) {
-	    let highestFreq = -1;
-	    let bestMatchingWord = '';
+	let highestFreq = -1;
+	let bestMatchingWord = '';
+	let previousWord = words[words.length - 1];
 
-	    possible.forEach(function(bigram) {
-		if (bigram.values > highestFreq) {
-		    highestFreq = bigram.values;
-		    bestMatchingWord = bigram.key();
+	for (var [key, value] of bigrams) {
+	    // If the first word of the bigram is the previous word and the second word
+	    // of the bigram starts with the correct letter
+	    if (key[0].toLowerCase() === previousWord.toLowerCase()
+		&& key[1].charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase()) {
+		// If it is the best matching so far
+		if (value > highestFreq) {
+		    highestFreq = value;
+		    bestMatchingWord = key[1];
 		}
-	    })
-	} else {
-	    // If not just pick a word at random
-	    let possible = freq.filter( w => {
-		return (w.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
-	    });
-	    let word = possible[Math.floor(Math.random() * possible.length)];
-	    
+	    }
+	}
+	
+	// If there is no match
+	if (highestFreq == -1) {
+	    // Just pick a word at random
+	    let possible = [];
+	    for (var wordFromFreq of freq.keys()) {
+		if (wordFromFreq.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase())
+		    possible.push(wordFromFreq);
+	    }
+	    word = possible[Math.floor(Math.random() * possible.length)];	    
 	}
     }
     
