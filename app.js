@@ -101,12 +101,12 @@ app.listen(2095, function () {
 });
 
 // DEBUG ....................................
-var text = 'foss';
-mangleMe([],text,[]);
+//var text = 'foss';
+//mangleMe([],text,[]);
 // DEBUG ....................................
 
-// DEBUG - original function mangleMe(body, res) {
-function mangleMe(body, text, res){
+// DEBUG function mangleMe(body, text, res){
+function mangleMe(body, res) {
     
     // returns the path to the word list which is separated by `\n`
     // const wordListPath = require('word-list');
