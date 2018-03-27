@@ -216,6 +216,7 @@ function partsManglerNGram(acro,words){
 	word = possible[Math.floor(Math.random() * possible.length)];
 
 	console.log(acro.charAt(words.length).toUpperCase() + " - Picked random word: " + word + " from " + possible.length + " options.");
+
     } else {
 	// Pick word which results in the highest P(word | previousWord)
 	// P(word | previousWord) = count(previousWord followed by word)
@@ -224,6 +225,7 @@ function partsManglerNGram(acro,words){
 	let highestFreq = -1;
 	let bestMatchingWord = '';
 	let previousWord = words[words.length - 1];
+
 	let matchCount = 0;
 
 	for (var [key, value] of bigrams) {
@@ -233,6 +235,7 @@ function partsManglerNGram(acro,words){
 		&& key[1].charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase()) {
 
 		matchCount++;
+
 		// If it is the best matching so far
 		if (value > highestFreq) {
 		    highestFreq = value;
@@ -245,6 +248,7 @@ function partsManglerNGram(acro,words){
 	if (highestFreq != -1)
 	    console.log(acro.charAt(words.length).toUpperCase() + " - Best matching word: " +
 			bestMatchingWord + " from " + matchCount + " possibilities. Freq " + highestFreq);
+
 	
 	// If there is no match
 	if (highestFreq == -1) {
