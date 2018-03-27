@@ -78,6 +78,8 @@ try {
     console.error(e);
 }
 
+console.log("Loaded word lists!");
+
 const slackToken = ''; // If you want to tie it to a single Slack team, use this
 
 app.get('/', function (req, res) {
@@ -212,6 +214,8 @@ function partsManglerNGram(acro,words){
 		possible.push(wordFromFreq);
 	}
 	word = possible[Math.floor(Math.random() * possible.length)];
+
+	console.log(acro.charAt(words.length).toUpperCase() + " - Picked random word: " + word + " from " + possible.length + " options.");
     } else {
 	// Pick word which results in the highest P(word | previousWord)
 	// P(word | previousWord) = count(previousWord followed by word)
@@ -220,12 +224,15 @@ function partsManglerNGram(acro,words){
 	let highestFreq = -1;
 	let bestMatchingWord = '';
 	let previousWord = words[words.length - 1];
+	let matchCount = 0;
 
 	for (var [key, value] of bigrams) {
 	    // If the first word of the bigram is the previous word and the second word
 	    // of the bigram starts with the correct letter
 	    if (key[0].toLowerCase() === previousWord.toLowerCase()
 		&& key[1].charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase()) {
+
+		matchCount++;
 		// If it is the best matching so far
 		if (value > highestFreq) {
 		    highestFreq = value;
@@ -233,6 +240,11 @@ function partsManglerNGram(acro,words){
 		}
 	    }
 	}
+
+	word = bestMatchingWord;
+	if (highestFreq != -1)
+	    console.log(acro.charAt(words.length).toUpperCase() + " - Best matching word: " +
+			bestMatchingWord + " from " + matchCount + " possibilities. Freq " + highestFreq);
 	
 	// If there is no match
 	if (highestFreq == -1) {
@@ -242,9 +254,12 @@ function partsManglerNGram(acro,words){
 		if (wordFromFreq.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase())
 		    possible.push(wordFromFreq);
 	    }
-	    word = possible[Math.floor(Math.random() * possible.length)];	    
+	    word = possible[Math.floor(Math.random() * possible.length)];
+	    console.log(acro.charAt(words.length).toUpperCase() + " - Picked random word: " + word + " from " + possible.length + " options.");
 	}
     }
+
+    word = word.toLowerCase();
     
     words.push(word);
     
