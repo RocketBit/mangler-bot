@@ -125,7 +125,7 @@ function mangleMe(body, res) {
     let maxLength = 5;
     if (ngramMangling) maxLength = 20;
     if(acro.length > maxLength){
-        res.send("Let's not be silly. Keep them 5 characters or less, mmmkay?");
+        res.send("Let's not be silly. Keep them " + maxLength + " characters or less, mmmkay?");
         return;
     }
     
