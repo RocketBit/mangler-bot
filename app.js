@@ -1,6 +1,6 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
 const fs = require('fs');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -20,7 +20,7 @@ const patterns = [
 ]
 
 // Load the word lists
-var lists = [];
+let lists = [];
 try {
     //lists.push(fs.readFileSync('./lists/adjectives.txt').toString().split('\r\n'));
     lists.push(require('./lists/adjectives-2.json').adjectives);
@@ -65,7 +65,7 @@ function mangleMe(body, res){
     // const wordListPath = require('word-list');
     // const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
     
-    let acro = body.text.split(' ')[0];
+    const acro = body.text.split(' ')[0];
     if(!acro || acro === ''){
         res.send('Please include an acronym with your request.');
         return;
@@ -81,14 +81,14 @@ function mangleMe(body, res){
         return;
     }
 
-    let patternSet = patterns[acro.length]
+    const patternSet = patterns[acro.length]
     console.log(patternSet)
-    let rando = Math.floor(Math.random() * patternSet.length)
+    const rando = Math.floor(Math.random() * patternSet.length)
     console.log(rando)
-    let pattern = patternSet[rando]
+    const pattern = patternSet[rando]
     console.log(pattern)
     
-    let newWords = partsMangler(acro,[],pattern);
+    const newWords = partsMangler(acro,[],pattern);
     console.log(newWords);
 
     let message = ''
@@ -106,7 +106,7 @@ function mangleMe(body, res){
       });
     }
     
-    let payload = {
+    const payload = {
         response_type: 'in_channel',
         text: message
     };
@@ -123,8 +123,8 @@ function partsMangler(acro,words,pattern){
     if(words && words.length >= acro.length){
         return words;
     }
-    let type = pattern[words.length]
-    let possible = lists[type].filter(w => {
+    const type = pattern[words.length]
+    const possible = lists[type].filter(w => {
         return (w.charAt(0).toLowerCase() === acro.charAt(words.length).toLowerCase());
     });
     let word = possible[Math.floor(Math.random() * possible.length)];
