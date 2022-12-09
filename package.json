@@ -14,7 +14,7 @@
     "body-parser": "^1.15.2",
     "eslint": "^5.7.0",
     "event-stream": "^4.0.1",
-    "express": "^4.14.0",
+    "express": "^4.17.3",
     "word-list": "^1.0.1"
   },
   "devDependencies": {
